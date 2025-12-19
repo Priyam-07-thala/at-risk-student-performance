@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display:flex; justify-content:space-between;">
+        <h1>Student Dashboard</h1>
+        <a href="/logout"><button class="outline">Logout</button></a>
+    </div>
+
+    {% if student_data %}
+    <div class="grid">
+        <div class="card">Attendance: {{ student_data.attendance }}</div>
+        <div class="card">Marks: {{ student_data.marks }}</div>
+        <div class="card">Assignments: {{ student_data.assignments }}</div>
+        <div class="card">Behavior: {{ student_data.behavior }}</div>
+        <div class="card">Risk: {{ student_data.risk }}</div>
+    </div>
+
+    <div class="card">
+        <canvas id="studentChart"></canvas>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if student_data %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="student-data" type="application/json">
+{{ student_data | tojson }}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const studentData = JSON.parse(
+        document.getElementById("student-data").textContent
+    );
+
+    new Chart(document.getElementById("studentChart"), {
+        type: "bar",
+        data: {
+            labels: ["Attendance", "Marks", "Assignments", "Behavior"],
+            datasets: [{
+                label: "Performance",
+                data: [
+                    studentData.attendance,
+                    studentData.marks,
+                    studentData.assignments,
+                    studentData.behavior
+                ]
+            }]
+        }
+    });
+</script>
+
+{% endif %}
+{% endblock %}

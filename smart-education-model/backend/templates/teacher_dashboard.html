@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="header">
+        <h1>Teacher Dashboard</h1>
+        <a href="/logout"><button class="outline">Logout</button></a>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="drop-zone" id="dropZone">
+                <p>Drag & Drop CSV here or click to upload</p>
+                <input type="file" name="file" accept=".csv">
+            </div>
+            <button type="submit" style="margin-top:15px;">Upload CSV</button>
+        </form>
+    </div>
+
+    <!-- Student Table + Chart -->
+    <div style="display:flex; gap:20px; align-items:flex-start;">
+
+        <!-- Student Table -->
+        <div class="card" style="flex:3;">
+            <h2>Students</h2>
+            <table width="100%" cellpadding="10">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Attendance</th>
+                    <th>Marks</th>
+                    <th>Assignments</th>
+                    <th>Behavior</th>
+                    <th>Risk</th>
+                </tr>
+
+                {% for s in students %}
+                <tr>
+                    <td>{{ s[0] }}</td>
+                    <td>{{ s[1] }}</td>
+                    <td>{{ s[2] }}</td>
+                    <td>{{ s[3] }}</td>
+                    <td>{{ s[4] }}</td>
+                    <td>{{ s[5] }}</td>
+                    <td>{{ s[6] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Chart -->
+        <div class="card" style="flex:1;">
+            <h3>Average Performance</h3>
+            <canvas id="teacherChart" height="220"></canvas>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script id="chart-data" type="application/json">
+{{ chart_data | tojson }}
+</script>
+
+<script>
+    const chartData = JSON.parse(
+        document.getElementById("chart-data").textContent
+    );
+
+    new Chart(document.getElementById("teacherChart"), {
+        type: "bar",
+        data: {
+            labels: ["Attendance", "Marks", "Assignments", "Behavior"],
+            datasets: [{
+                data: chartData
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}
